@@ -78,8 +78,21 @@ function commit_vars_store() {
 
 function setup_bosh_env_vars() {
   set +x
-  pushd "bbl-state/${BBL_STATE_DIR}"
-    eval "$(bbl print-env)"
+  pushd "bbl-state"
+    CWD=`pwd`
+    VARS_STORE="bosh int vars-store.yml --path="
+    PK=$CWD/jumpbox-private-key
+    if [ ! -f $PK ]; then
+      echo "private_key not found. creating new..."
+      $VARS_STORE/jumpbox_ssh/private_key > $PK
+      chmod u=rw,go-rwX $PK
+      echo "private_key created."
+    fi
+    export BOSH_ENVIRONMENT=https://$($VARS_STORE/external_ip):25555
+    export BOSH_GW_PRIVATE_KEY=$PK
+    export BOSH_CA_CERT=$($VARS_STORE/director_ssl/ca)
+    export BOSH_CLIENT=admin
+    export BOSH_CLIENT_SECRET=$($VARS_STORE/admin_password)
   popd
   set -x
 }
