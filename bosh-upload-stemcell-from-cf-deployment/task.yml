@@ -22,10 +22,14 @@ params:
   # - If blank or '.', uses `bbl-state` input as the location for bbl state
   # - If the specified path does not exist, it will be created
 
-  INFRASTRUCTURE: google
+  INFRASTRUCTURE: openstack
   # - Required
   # - Used to determine which stemcell will be uploaded
+<<<<<<< Updated upstream
   # - Must be one of: aws, bosh-lite, google, vsphere or azure
+=======
+  # - Must be one of: aws, bosh-lite, google, vsphere, or openstack
+>>>>>>> Stashed changes
 
   MANIFEST_FILE: cf-deployment.yml
   # - Required
