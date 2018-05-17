@@ -5,27 +5,26 @@ image_resource:
   type: docker-image
   source:
     repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
-    tag: v5.8.0
+    tag: v5.9.0
 
 inputs:
 - name: cf-deployment-concourse-tasks  # - This repo
 - name: cf-deployment  # - The cf-deployment manifest
-- name: bbl-state  # - The repo containing the Director's bbl state dir
+- name: bucc-state
 
 run:
   path: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task
+#run:
+#   path: ls 
+#   args: ['-alR']
 
 params:
-  BBL_STATE_DIR: bbl-state
-  # - Path to the directory containing the `bbl-state.json` file
-  # - The path is relative to the `bbl-state` input
-  # - If blank or '.', uses `bbl-state` input as the location for bbl state
-  # - If the specified path does not exist, it will be created
+  BOSH_STATE_DIR: bucc-state
 
-  INFRASTRUCTURE: google
+  INFRASTRUCTURE: openstack
   # - Required
   # - Used to determine which stemcell will be uploaded
-  # - Must be one of: aws, bosh-lite, google, or vsphere
+  # - Must be one of: aws, bosh-lite, google, vsphere, azure or openstack
 
   MANIFEST_FILE: cf-deployment.yml
   # - Required

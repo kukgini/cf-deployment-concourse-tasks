@@ -2,11 +2,11 @@
 
 check_bbl_input_params() {
   set +x
-  # Checks that we have IaaS credentials for either GCP or AWS
-  if [ ! -z "${BBL_GCP_SERVICE_ACCOUNT_KEY}" ] || [ ! -z "${BBL_AWS_ACCESS_KEY_ID}" -a ! -z "${BBL_AWS_SECRET_ACCESS_KEY}" ]; then
+  # Checks that we have IaaS credentials for GCP or AWS or Azure
+  if [ ! -z "${BBL_GCP_SERVICE_ACCOUNT_KEY}" ] || [ ! -z "${BBL_AWS_ACCESS_KEY_ID}" -a ! -z "${BBL_AWS_SECRET_ACCESS_KEY}" ] || [ ! -z "${BBL_AZURE_CLIENT_ID}" -a ! -z "${BBL_AZURE_CLIENT_SECRET}" -a ! -z "${BBL_AZURE_TENANT_ID}" -a ! -z "${BBL_AZURE_SUBSCRIPTION_ID}" ]; then
     return 0
   else
-    echo 'The BBL task must be configured with IaaS credentials. Please configure either `BBL_GCP_SERVICE_ACCOUNT_KEY`, or the `BBL_AWS_ACCESS_KEY_ID` `BBL_AWS_SECRET_ACCESS_KEY` pair.'
+    echo 'The BBL task must be configured with IaaS credentials. Please configure either `BBL_GCP_SERVICE_ACCOUNT_KEY`, or the `BBL_AWS_ACCESS_KEY_ID` `BBL_AWS_SECRET_ACCESS_KEY` pair, or `BBL_AZURE_CLIENT_ID` `BBL_AZURE_CLIENT_SECRET` `BBL_AZURE_TENANT_ID` `BBL_AZURE_SUBSCRIPTION_ID` tetrad'
     exit 1
   fi
   set -x
@@ -64,7 +64,10 @@ function set_git_config() {
 }
 
 function commit_vars_store() {
-  pushd vars-store
+  local root_dir
+  root_dir="${1}"
+
+  pushd "${root_dir}"/vars-store
     if [[ -n $(git status --porcelain) ]]; then
       set_git_config
       git add "${VARS_STORE_FILE}"
@@ -73,27 +76,21 @@ function commit_vars_store() {
   popd
 
   shopt -s dotglob
-  cp -R vars-store/* updated-vars-store/
+  cp -R "${root_dir}"/vars-store/* "${root_dir}"/updated-vars-store/
 }
 
 function setup_bosh_env_vars() {
   set +x
-  pushd "bbl-state"
-    CWD=`pwd`
-    VARS_STORE="bosh int vars-store.yml --path="
-    PK=$CWD/jumpbox-private-key
-    if [ ! -f $PK ]; then
-      echo "private_key not found. creating new..."
-      $VARS_STORE/jumpbox_ssh/private_key > $PK
-      chmod u=rw,go-rwX $PK
-      echo "private_key created."
-    fi
-    export BOSH_ENVIRONMENT=https://$($VARS_STORE/external_ip):25555
-    export BOSH_GW_PRIVATE_KEY=$PK
-    export BOSH_CA_CERT=$($VARS_STORE/director_ssl/ca)
-    export BOSH_CLIENT=admin
-    export BOSH_CLIENT_SECRET=$($VARS_STORE/admin_password)
-  popd
+  local V="bosh int ${BOSH_STATE_DIR}/vars.yml --path="
+  local C="bosh int ${BOSH_STATE_DIR}/creds.yml --path="
+  export BOSH_ENVIRONMENT="https://$($V/internal_ip):25555"
+  export BOSH_CA_CERT="$($C/director_ssl/ca)"
+  export BOSH_CLIENT="admin"
+  export BOSH_CLIENT_SECRET="$($C/admin_password)"
+  echo BOSH_ENVIRONMENT: ${BOSH_ENVIRONMENT}
+  echo BOSH_CA_CERT: ${BOSH_CA_CERT}
+  echo BOSH_CLIENT: ${BOSH_CLIENT}
+  echo BOSH_CLIENT_SECRET: ${BOSH_CLIENT_SECRET}
   set -x
 }
 

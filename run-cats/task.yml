@@ -5,7 +5,7 @@ image_resource:
   type: docker-image
   source:
     repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
-    tag: v5.8.0
+    tag: v5.9.0
 
 inputs:
 - name: cf-deployment-concourse-tasks
@@ -37,3 +37,7 @@ params:
   # - Optional
   # - If set to `true`, the task will capture logs and save them
   #   to the output directory
+
+  FLAKE_ATTEMPTS: 2
+  # - Optional
+  # - The number of times to retry a single failed test

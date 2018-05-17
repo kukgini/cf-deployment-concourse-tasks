@@ -10,7 +10,7 @@ function check_upload_stemcell_params() {
     exit 1
   fi
   local supported_infrastructures
-  supported_infrastructures=("aws" "google" "boshlite" "bosh-lite" "vsphere")
+  supported_infrastructures=("aws" "google" "boshlite" "bosh-lite" "vsphere" "azure" "openstack")
   any_matched=false
   for iaas in ${supported_infrastructures[*]}; do
     if [ "${INFRASTRUCTURE}" == "${iaas}" ]; then
@@ -41,22 +41,27 @@ function upload_stemcell() {
   # As of this writing, the new bosh cli doesn't have --skip-if-exists
   set +e
   local existing_stemcell
+  bosh stemcells
   existing_stemcell=$(bosh stemcells | grep "${os}" | awk '{print $2}' | tr -d "\*" | grep ^"${version}"$ )
   set -e
 
   local stemcell_name
-  stemcell_name="bosh"
 
   if [ "$INFRASTRUCTURE" = "aws" ]; then
-    stemcell_name="${stemcell_name}-aws-xen-hvm"
+    stemcell_name="bosh-aws-xen-hvm"
   elif [ "$INFRASTRUCTURE" = "google" ]; then
-    stemcell_name="${stemcell_name}-google-kvm"
+    stemcell_name="bosh-google-kvm"
   elif [ "$INFRASTRUCTURE" = "boshlite" ]; then
-    stemcell_name="${stemcell_name}-warden-boshlite"
+    stemcell_name="bosh-warden-boshlite"
   elif [ "$INFRASTRUCTURE" = "bosh-lite" ]; then
-    stemcell_name="${stemcell_name}-warden-boshlite"
+    stemcell_name="bosh-warden-boshlite"
   elif [ "$INFRASTRUCTURE" = "vsphere" ]; then
+    stemcell_name="bosh-vsphere-esxi"
+  elif [ "$INFRASTRUCTURE" = "azure" ]; then
+    stemcell_name="bosh-azure-hyperv"
     stemcell_name="${stemcell_name}-vsphere-esxi"
+  elif [ "$INFRASTRUCTURE" = "openstack" ]; then
+    stemcell_name="${stemcell_name}-openstack-kvm"
   fi
 
   stemcell_name="${stemcell_name}-${os}-${bosh_agent}"
@@ -83,7 +88,9 @@ function upload_stemcell() {
 
 function main() {
   check_upload_stemcell_params
-  setup_bosh_env_vars 'bbl-state'
+  echo =====================
+  setup_bosh_env_vars 
+  echo =====================
   upload_stemcell
 }
 
