@@ -59,7 +59,6 @@ function upload_stemcell() {
     stemcell_name="bosh-vsphere-esxi"
   elif [ "$INFRASTRUCTURE" = "azure" ]; then
     stemcell_name="bosh-azure-hyperv"
-    stemcell_name="${stemcell_name}-vsphere-esxi"
   elif [ "$INFRASTRUCTURE" = "openstack" ]; then
     stemcell_name="${stemcell_name}-openstack-kvm"
   fi
