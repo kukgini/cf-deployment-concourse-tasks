@@ -81,16 +81,9 @@ function commit_vars_store() {
 
 function setup_bosh_env_vars() {
   set +x
-  local V="bosh int ${BOSH_STATE_DIR}/vars.yml --path="
-  local C="bosh int ${BOSH_STATE_DIR}/creds.yml --path="
-  export BOSH_ENVIRONMENT="https://$($V/internal_ip):25555"
-  export BOSH_CA_CERT="$($C/director_ssl/ca)"
-  export BOSH_CLIENT="admin"
-  export BOSH_CLIENT_SECRET="$($C/admin_password)"
-  echo BOSH_ENVIRONMENT: ${BOSH_ENVIRONMENT}
-  echo BOSH_CA_CERT: ${BOSH_CA_CERT}
-  echo BOSH_CLIENT: ${BOSH_CLIENT}
-  echo BOSH_CLIENT_SECRET: ${BOSH_CLIENT_SECRET}
+  pushd "bbl-state/${BBL_STATE_DIR}"
+    eval "$(bbl print-env)"
+  popd
   set -x
 }
 

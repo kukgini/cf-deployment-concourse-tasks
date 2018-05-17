@@ -14,12 +14,13 @@ inputs:
 
 run:
   path: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task
-#run:
-#   path: ls 
-#   args: ['-alR']
 
 params:
-  BOSH_STATE_DIR: bucc-state
+  BBL_STATE_DIR: bbl-state
+  # - Path to the directory containing the `bbl-state.json` file
+  # - The path is relative to the `bbl-state` input
+  # - If blank or '.', uses `bbl-state` input as the location for bbl state
+  # - If the specified path does not exist, it will be created
 
   INFRASTRUCTURE: openstack
   # - Required
