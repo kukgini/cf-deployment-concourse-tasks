@@ -60,7 +60,7 @@ function upload_stemcell() {
   elif [ "$INFRASTRUCTURE" = "azure" ]; then
     stemcell_name="bosh-azure-hyperv"
   elif [ "$INFRASTRUCTURE" = "openstack" ]; then
-    stemcell_name="${stemcell_name}-openstack-kvm"
+    stemcell_name="bosh-openstack-kvm"
   fi
 
   stemcell_name="${stemcell_name}-${os}-${bosh_agent}"
