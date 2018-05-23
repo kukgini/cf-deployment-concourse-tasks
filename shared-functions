@@ -82,7 +82,7 @@ function commit_vars_store() {
 function setup_bosh_env_vars() {
   set +x
   pushd "bbl-state/${BBL_STATE_DIR}"
-    eval "$(bbl print-env)"
+    eval "$(bbl print-env | grep -v PROXY)"
   popd
   set -x
 }
